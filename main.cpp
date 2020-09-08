@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <vector>
+#include <iostream>
 #include <tchar.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -9,7 +10,6 @@
 
 
 #ifdef _DEBUG 
-#include <iostream>
 #endif // _DEBUG 
 
 using namespace std;
@@ -39,7 +39,7 @@ LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 int main()
 {
 #else
-int WINAPI Winmain(HINSTANCE, HINSTANCE, LPSTR, int)
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 #endif
 
@@ -53,15 +53,14 @@ int WINAPI Winmain(HINSTANCE, HINSTANCE, LPSTR, int)
 		void** ppDevice);
 
 
+	// アダプターの選択
 	std::vector <IDXGIAdapter*> adapters;//取得できたアダプターを格納
 	IDXGIAdapter* tmpAdapter;
 	auto result = CreateDXGIFactory1(IID_PPV_ARGS(&_dxgiFactory));
-
 	for (int i = 0; _dxgiFactory->EnumAdapters(i, &tmpAdapter) != DXGI_ERROR_NOT_FOUND; i++)
 	{
 		adapters.push_back(tmpAdapter);
 	}
-
 	for (auto adpt : adapters)
 	{
 		DXGI_ADAPTER_DESC adesc = {};
@@ -83,14 +82,14 @@ int WINAPI Winmain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	for (auto level : d3dFeatureLevelLst)
 	{
-		if (D3D12CreateDevice(nullptr, level, IID_PPV_ARGS(&_dev)) == S_OK)// _dev=null を渡すと自動で取得されるが最適とは限らない
+		if (D3D12CreateDevice(nullptr, level, IID_PPV_ARGS(&_dev)) == S_OK)// _dev=null を渡すと自動で取得されるが最適とは限らないらしい
 		{
 			d3dFeatureLevel = level;
 			break;
 		}
 	}
 
-
+	// ウインドウの作成
 	WNDCLASSEX w = {};
 	w.cbSize = sizeof(WNDCLASSEX);
 	w.lpfnWndProc = (WNDPROC)WindowProcedure;
@@ -99,7 +98,7 @@ int WINAPI Winmain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	RegisterClassEx(&w);
 
-	RECT wrc = { 0,0, 100, 200};
+	RECT wrc = { 0,0, 100, 200 };
 
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
